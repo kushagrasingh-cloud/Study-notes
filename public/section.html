@@ -176,13 +176,12 @@
         const semesterId = semesters[0].id;
 
         const { data: sections, error: sectionError } =
-          await supabaseClient
-            .from("sections")
-            .select("id, name")
-            .eq("semester_id", semesterId)
-            .eq("semester_number", 1)
-.eq("course_id", 2)
-.limit(1);
+  await supabaseClient
+    .from("sections")
+    .select("id, name")
+    .eq("semester_id", semesterId)
+    .eq("name", sectionName)
+    .limit(1);
 
         if (sectionError) {
           throw sectionError;
