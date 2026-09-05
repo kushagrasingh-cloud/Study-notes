@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Section A1 - Study Notes</title>
+  <title>Section - Study Notes</title>
 
   <style>
     * {
@@ -84,7 +84,6 @@
       border-radius: 8px;
       text-decoration: none;
       font-weight: 600;
-      cursor: pointer;
     }
 
     .view {
@@ -95,6 +94,13 @@
     .download {
       background: #e5e7eb;
       color: #1f2937;
+    }
+
+    .status {
+      background: white;
+      padding: 22px;
+      border-radius: 16px;
+      color: #6b7280;
     }
 
     footer {
@@ -121,46 +127,8 @@
       </p>
     </div>
 
-    <div class="subject">
-      <h3>Mathematics-I</h3>
-      <p>MATH101</p>
-      <a class="btn view" href="#" onclick="alert('PDF view next step mein connect hoga.'); return false;">View</a>
-      <a class="btn download" href="#" onclick="alert('PDF download next step mein connect hoga.'); return false;">Download</a>
-    </div>
-
-    <div class="subject">
-      <h3>Programming for Problem Solving</h3>
-      <p>CSE101</p>
-      <a class="btn view" href="#" onclick="alert('PDF view next step mein connect hoga.'); return false;">View</a>
-      <a class="btn download" href="#" onclick="alert('PDF download next step mein connect hoga.'); return false;">Download</a>
-    </div>
-
-    <div class="subject">
-      <h3>Engineering Physics</h3>
-      <p>PHY101</p>
-      <a class="btn view" href="#" onclick="alert('PDF view next step mein connect hoga.'); return false;">View</a>
-      <a class="btn download" href="#" onclick="alert('PDF download next step mein connect hoga.'); return false;">Download</a>
-    </div>
-
-    <div class="subject">
-      <h3>Engineering Chemistry</h3>
-      <p>CHEM101</p>
-      <a class="btn view" href="#" onclick="alert('PDF view next step mein connect hoga.'); return false;">View</a>
-      <a class="btn download" href="#" onclick="alert('PDF download next step mein connect hoga.'); return false;">Download</a>
-    </div>
-
-    <div class="subject">
-      <h3>Basic Electrical Engineering</h3>
-      <p>EEE101</p>
-      <a class="btn view" href="#" onclick="alert('PDF view next step mein connect hoga.'); return false;">View</a>
-      <a class="btn download" href="#" onclick="alert('PDF download next step mein connect hoga.'); return false;">Download</a>
-    </div>
-
-    <div class="subject">
-      <h3>Engineering Graphics</h3>
-      <p>EG101</p>
-      <a class="btn view" href="#" onclick="alert('PDF view next step mein connect hoga.'); return false;">View</a>
-      <a class="btn download" href="#" onclick="alert('PDF download next step mein connect hoga.'); return false;">Download</a>
+    <div id="notesList">
+      <div class="status">Loading notes...</div>
     </div>
 
   </div>
@@ -168,12 +136,125 @@
   <footer>
     © 2026 Study Notes
   </footer>
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const section = params.get("section") || "A1";
 
-  document.getElementById("sectionTitle").textContent =
-    "Section " + section;
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL =
+      "https://cwyjgukhelxgzkjdujiv.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+      "https://cwyjgukhelxgzkjdujiv.supabase.co";";
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    const params = new URLSearchParams(window.location.search);
+    const sectionName = params.get("section") || "A1";
+
+    document.getElementById("sectionTitle").textContent =
+      "Section " + sectionName;
+
+    async function loadNotes() {
+
+      const notesList = document.getElementById("notesList");
+
+      // Semester 1 ki section find karo
+      const { data: sections, error: sectionError } =
+        await supabaseClient
+          .from("sections")
+          .select("id, name")
+          .eq("name", sectionName);
+
+      if (sectionError || !sections || sections.length === 0) {
+        notesList.innerHTML =
+          '<div class="status">Section nahi mili.</div>';
+        return;
+      }
+
+      const sectionId = sections[0].id;
+
+      // Is section ke notes lao
+      const { data: notes, error: notesError } =
+        await supabaseClient
+          .from("notes")
+          .select(`
+            id,
+            title,
+            description,
+            file_url,
+            subjects (
+              name,
+              code
+            )
+          `)
+          .eq("section_id", sectionId)
+          .order("id");
+
+      if (notesError) {
+        notesList.innerHTML =
+          '<div class="status">Notes load nahi ho paaye.</div>';
+        console.error(notesError);
+        return;
+      }
+
+      if (!notes || notes.length === 0) {
+        notesList.innerHTML =
+          '<div class="status">Is section ke liye abhi notes available nahi hain.</div>';
+        return;
+      }
+
+      notesList.innerHTML = "";
+
+      notes.forEach(note => {
+
+        const subjectName =
+          note.subjects?.name || "Subject";
+
+        const subjectCode =
+          note.subjects?.code || "";
+
+        const card = document.createElement("div");
+        card.className = "subject";
+
+        card.innerHTML = `
+          <h3>${subjectName}</h3>
+          <p>${subjectCode} — ${note.title}</p>
+
+          ${
+            note.file_url
+            ? `
+              <a
+                class="btn view"
+                href="${note.file_url}"
+                target="_blank"
+                rel="noopener">
+                View PDF
+              </a>
+
+              <a
+                class="btn download"
+                href="${note.file_url}"
+                download>
+                Download PDF
+              </a>
+            `
+            : `
+              <span class="status">
+                PDF abhi available nahi hai.
+              </span>
+            `
+          }
+        `;
+
+        notesList.appendChild(card);
+      });
+    }
+
+    loadNotes();
+  </script>
+
 </body>
 </html>
