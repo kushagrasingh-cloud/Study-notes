@@ -179,15 +179,44 @@
 
 <script>
   const SUPABASE_URL = "https://cwyjgukhelxgzkjdujiv.supabase.co";
-
-  const SUPABASE_ANON_KEY = "sb_secret_NcwnE6FegW31HcTwO6SKNQ_qJzviUB3";
+  const SUPABASE_ANON_KEY = "YAHAN_WALI_KEY";
 
   const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
 
-  console.log("Supabase connected");
+  async function loadDegrees() {
+    const { data, error } = await supabaseClient
+      .from("degrees")
+      .select("*")
+      .order("name");
+
+    if (error) {
+      console.error("Database error:", error);
+      return;
+    }
+
+    const cards = document.querySelector(".cards");
+
+    cards.innerHTML = "";
+
+    data.forEach(degree => {
+      const card = document.createElement("div");
+
+      card.className = "card";
+
+      card.innerHTML = `
+        <div class="card-icon">🎓</div>
+        <h3>${degree.name}</h3>
+        <p>${degree.description || "Study notes and materials"}</p>
+      `;
+
+      cards.appendChild(card);
+    });
+  }
+
+  loadDegrees();
 </script>
 </body>
 </html>
