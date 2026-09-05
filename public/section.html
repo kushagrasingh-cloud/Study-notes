@@ -115,7 +115,7 @@
   <div class="container">
 
     <div class="hero">
-      <h1>Section A1</h1>
+      <h1 id="sectionTitle">Section A1</h1>
       <p class="subtitle">
         B.Tech CSE — Semester 1
       </p>
@@ -168,6 +168,12 @@
   <footer>
     © 2026 Study Notes
   </footer>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const section = params.get("section") || "A1";
 
+  document.getElementById("sectionTitle").textContent =
+    "Section " + section;
+</script>
 </body>
 </html>
