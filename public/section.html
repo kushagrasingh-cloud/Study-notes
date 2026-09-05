@@ -1,260 +1,131 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Section - Study Notes</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
+<script>
+const SUPABASE_URL = "https://cwyjgukhelxgzkjdujiv.supabase.co";
+const SUPABASE_ANON_KEY = "https://cwyjgukhelxgzkjdujiv.supabase.co";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const params = new URLSearchParams(window.location.search);
+const sectionName = params.get("section") || "A1";
+
+document.getElementById("sectionTitle").textContent =
+  "Section " + sectionName;
+
+async function loadNotes() {
+  const notesList = document.getElementById("notesList");
+
+  try {
+    // Semester 1 find karo
+    const { data: semesters, error: semError } =
+      await supabaseClient
+        .from("semesters")
+        .select("id")
+        .eq("semester_number", 1)
+        .limit(1);
+
+    if (semError || !semesters.length) {
+      throw semError || new Error("Semester 1 nahi mila");
     }
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f9fc;
-      color: #1f2937;
+    const semesterId = semesters[0].id;
+
+    // Exact section find karo
+    const { data: sections, error: sectionError } =
+      await supabaseClient
+        .from("sections")
+        .select("id, name")
+        .eq("semester_id", semesterId)
+        .eq("name", sectionName)
+        .limit(1);
+
+    if (sectionError || !sections.length) {
+      throw sectionError || new Error("Section nahi mila");
     }
 
-    nav {
-      background: white;
-      padding: 18px 6%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    const sectionId = sections[0].id;
+
+    // Is section ke notes
+    const { data: notes, error: notesError } =
+      await supabaseClient
+        .from("notes")
+        .select("id, title, description, file_url, subject_id")
+        .eq("section_id", sectionId)
+        .order("id");
+
+    if (notesError) {
+      throw notesError;
     }
 
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
+    if (!notes.length) {
+      notesList.innerHTML =
+        '<div class="status">Is section ke liye abhi notes available nahi hain.</div>';
+      return;
     }
 
-    .back {
-      color: #2563eb;
-      text-decoration: none;
-      font-weight: 600;
-    }
+    notesList.innerHTML = "";
 
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 40px 20px;
-    }
+    for (const note of notes) {
 
-    .hero {
-      background: white;
-      padding: 30px;
-      border-radius: 18px;
-      margin-bottom: 30px;
-    }
+      let subjectName = "Subject";
+      let subjectCode = "";
 
-    h1 {
-      margin: 0 0 10px;
-      font-size: 34px;
-    }
+      if (note.subject_id) {
+        const { data: subject } =
+          await supabaseClient
+            .from("subjects")
+            .select("name, code")
+            .eq("id", note.subject_id)
+            .limit(1)
+            .maybeSingle();
 
-    .subtitle {
-      margin: 0;
-      color: #6b7280;
-    }
-
-    .subject {
-      background: white;
-      padding: 22px;
-      margin-bottom: 15px;
-      border-radius: 16px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-    }
-
-    .subject h3 {
-      margin: 0 0 8px;
-    }
-
-    .subject p {
-      margin: 0 0 15px;
-      color: #6b7280;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 10px 16px;
-      margin-right: 8px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .view {
-      background: #2563eb;
-      color: white;
-    }
-
-    .download {
-      background: #e5e7eb;
-      color: #1f2937;
-    }
-
-    .status {
-      background: white;
-      padding: 22px;
-      border-radius: 16px;
-      color: #6b7280;
-    }
-
-    footer {
-      text-align: center;
-      padding: 30px;
-      color: #6b7280;
-    }
-  </style>
-</head>
-
-<body>
-
-  <nav>
-    <div class="logo">Study Notes</div>
-    <a class="back" href="cse.html">← CSE</a>
-  </nav>
-
-  <div class="container">
-
-    <div class="hero">
-      <h1 id="sectionTitle">Section A1</h1>
-      <p class="subtitle">
-        B.Tech CSE — Semester 1
-      </p>
-    </div>
-
-    <div id="notesList">
-      <div class="status">Loading notes...</div>
-    </div>
-
-  </div>
-
-  <footer>
-    © 2026 Study Notes
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    const SUPABASE_URL =
-      "https://cwyjgukhelxgzkjdujiv.supabase.co";
-
-    const SUPABASE_ANON_KEY =
-      "https://cwyjgukhelxgzkjdujiv.supabase.co";";
-
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
-
-    const params = new URLSearchParams(window.location.search);
-    const sectionName = params.get("section") || "A1";
-
-    document.getElementById("sectionTitle").textContent =
-      "Section " + sectionName;
-
-    async function loadNotes() {
-
-      const notesList = document.getElementById("notesList");
-
-      // Semester 1 ki section find karo
-      const { data: sections, error: sectionError } =
-        await supabaseClient
-          .from("sections")
-          .select("id, name")
-          .eq("name", sectionName);
-
-      if (sectionError || !sections || sections.length === 0) {
-        notesList.innerHTML =
-          '<div class="status">Section nahi mili.</div>';
-        return;
+        if (subject) {
+          subjectName = subject.name || "Subject";
+          subjectCode = subject.code || "";
+        }
       }
 
-      const sectionId = sections[0].id;
+      const card = document.createElement("div");
+      card.className = "subject";
 
-      // Is section ke notes lao
-      const { data: notes, error: notesError } =
-        await supabaseClient
-          .from("notes")
-          .select(`
-            id,
-            title,
-            description,
-            file_url,
-            subjects (
-              name,
-              code
-            )
-          `)
-          .eq("section_id", sectionId)
-          .order("id");
+      card.innerHTML = `
+        <h3>${subjectName}</h3>
+        <p>${subjectCode} — ${note.title}</p>
 
-      if (notesError) {
-        notesList.innerHTML =
-          '<div class="status">Notes load nahi ho paaye.</div>';
-        console.error(notesError);
-        return;
-      }
-
-      if (!notes || notes.length === 0) {
-        notesList.innerHTML =
-          '<div class="status">Is section ke liye abhi notes available nahi hain.</div>';
-        return;
-      }
-
-      notesList.innerHTML = "";
-
-      notes.forEach(note => {
-
-        const subjectName =
-          note.subjects?.name || "Subject";
-
-        const subjectCode =
-          note.subjects?.code || "";
-
-        const card = document.createElement("div");
-        card.className = "subject";
-
-        card.innerHTML = `
-          <h3>${subjectName}</h3>
-          <p>${subjectCode} — ${note.title}</p>
-
-          ${
-            note.file_url
+        ${
+          note.file_url
             ? `
-              <a
-                class="btn view"
-                href="${note.file_url}"
-                target="_blank"
-                rel="noopener">
-                View PDF
+              <a class="btn view"
+                 href="${note.file_url}"
+                 target="_blank"
+                 rel="noopener">
+                 View PDF
               </a>
 
-              <a
-                class="btn download"
-                href="${note.file_url}"
-                download>
-                Download PDF
+              <a class="btn download"
+                 href="${note.file_url}"
+                 download>
+                 Download PDF
               </a>
             `
             : `
-              <span class="status">
-                PDF abhi available nahi hai.
-              </span>
+              <p>PDF available nahi hai.</p>
             `
-          }
-        `;
+        }
+      `;
 
-        notesList.appendChild(card);
-      });
+      notesList.appendChild(card);
     }
 
-    loadNotes();
-  </script>
+  } catch (error) {
+    console.error(error);
+    notesList.innerHTML =
+      '<div class="status">Notes load nahi ho paaye. Please refresh karke try karo.</div>';
+  }
+}
 
-</body>
-</html>
+loadNotes();
+</script>
