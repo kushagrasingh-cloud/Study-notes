@@ -64,36 +64,26 @@
       margin-top: 30px;
     }
 
-    .semester {
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .section-card {
       background: white;
-      padding: 24px;
-      margin-top: 15px;
+      padding: 25px 15px;
       border-radius: 16px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
       box-shadow: 0 3px 12px rgba(0,0,0,0.06);
     }
 
-    .semester h3 {
-      margin-top: 0;
-      color: #2563eb;
-    }
-
-    .subject {
-      padding: 14px 0;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .subject:last-child {
-      border-bottom: none;
-    }
-
-    .subject-name {
-      font-weight: 600;
-    }
-
-    .subject-code {
-      color: #6b7280;
-      font-size: 14px;
-      margin-top: 4px;
+    .section-card:hover {
+      transform: translateY(-2px);
     }
 
     footer {
@@ -116,43 +106,22 @@
     <div class="hero">
       <h1>Computer Science and Engineering</h1>
       <p class="subtitle">
-        B.Tech CSE — Semesters and subjects
+        B.Tech CSE — Select your semester and section
       </p>
     </div>
 
     <h2>Semester 1</h2>
 
-    <div class="semester">
+    <div class="section-grid">
 
-      <div class="subject">
-        <div class="subject-name">Mathematics-I</div>
-        <div class="subject-code">MATH101</div>
-      </div>
-
-      <div class="subject">
-        <div class="subject-name">Programming for Problem Solving</div>
-        <div class="subject-code">CSE101</div>
-      </div>
-
-      <div class="subject">
-        <div class="subject-name">Engineering Physics</div>
-        <div class="subject-code">PHY101</div>
-      </div>
-
-      <div class="subject">
-        <div class="subject-name">Engineering Chemistry</div>
-        <div class="subject-code">CHEM101</div>
-      </div>
-
-      <div class="subject">
-        <div class="subject-name">Basic Electrical Engineering</div>
-        <div class="subject-code">EEE101</div>
-      </div>
-
-      <div class="subject">
-        <div class="subject-name">Engineering Graphics</div>
-        <div class="subject-code">EG101</div>
-      </div>
+      <div class="section-card" onclick="openSection('A1')">A1</div>
+      <div class="section-card" onclick="openSection('A2')">A2</div>
+      <div class="section-card" onclick="openSection('A3')">A3</div>
+      <div class="section-card" onclick="openSection('A4')">A4</div>
+      <div class="section-card" onclick="openSection('A5')">A5</div>
+      <div class="section-card" onclick="openSection('A6')">A6</div>
+      <div class="section-card" onclick="openSection('A7')">A7</div>
+      <div class="section-card" onclick="openSection('A8')">A8</div>
 
     </div>
 
@@ -161,6 +130,12 @@
   <footer>
     © 2026 Study Notes
   </footer>
+
+  <script>
+    function openSection(section) {
+      alert(section + " selected");
+    }
+  </script>
 
 </body>
 </html>
