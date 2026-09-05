@@ -159,11 +159,12 @@
       try {
 
         const { data: semesters, error: semesterError } =
-          await supabaseClient
-            .from("semesters")
-            .select("id")
-            .eq("semester_number", 1)
-            .limit(1);
+  await supabaseClient
+    .from("semesters")
+    .select("id")
+    .eq("semester_number", 1)
+    .eq("course_id", 2)
+    .limit(1);
 
         if (semesterError) {
           throw semesterError;
