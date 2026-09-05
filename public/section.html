@@ -269,11 +269,9 @@
         }
 
       } catch (error) {
-
-        console.error(error);
-
-        notesList.innerHTML =
-          '<div class="status">Notes load nahi ho paaye.</div>';
+  notesList.innerHTML =
+    '<div class="status">ERROR: ' + error.message + '</div>';
+      }
       }
     }
 
