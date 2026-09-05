@@ -2,7 +2,137 @@
 
 <script>
 const SUPABASE_URL = "https://cwyjgukhelxgzkjdujiv.supabase.co";
+const SUPABASE_ANON_KEY = "<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://cwyjgukhelxgzkjdujiv.supabase.co";
 const SUPABASE_ANON_KEY = "https://cwyjgukhelxgzkjdujiv.supabase.co/storage/v1/object/public/Notes/ACS101%20Assignment-1%20(A4).pdf";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const params = new URLSearchParams(window.location.search);
+const sectionName = params.get("section") || "A1";
+
+document.getElementById("sectionTitle").textContent =
+  "Section " + sectionName;
+
+async function loadNotes() {
+  const notesList = document.getElementById("notesList");
+
+  try {
+    // Semester 1 find karo
+    const { data: semesters, error: semError } =
+      await supabaseClient
+        .from("semesters")
+        .select("id")
+        .eq("semester_number", 1)
+        .limit(1);
+
+    if (semError || !semesters.length) {
+      throw semError || new Error("Semester 1 nahi mila");
+    }
+
+    const semesterId = semesters[0].id;
+
+    // Exact section find karo
+    const { data: sections, error: sectionError } =
+      await supabaseClient
+        .from("sections")
+        .select("id, name")
+        .eq("semester_id", semesterId)
+        .eq("name", sectionName)
+        .limit(1);
+
+    if (sectionError || !sections.length) {
+      throw sectionError || new Error("Section nahi mila");
+    }
+
+    const sectionId = sections[0].id;
+
+    // Is section ke notes
+    const { data: notes, error: notesError } =
+      await supabaseClient
+        .from("notes")
+        .select("id, title, description, file_url, subject_id")
+        .eq("section_id", sectionId)
+        .order("id");
+
+    if (notesError) {
+      throw notesError;
+    }
+
+    if (!notes.length) {
+      notesList.innerHTML =
+        '<div class="status">Is section ke liye abhi notes available nahi hain.</div>';
+      return;
+    }
+
+    notesList.innerHTML = "";
+
+    for (const note of notes) {
+
+      let subjectName = "Subject";
+      let subjectCode = "";
+
+      if (note.subject_id) {
+        const { data: subject } =
+          await supabaseClient
+            .from("subjects")
+            .select("name, code")
+            .eq("id", note.subject_id)
+            .limit(1)
+            .maybeSingle();
+
+        if (subject) {
+          subjectName = subject.name || "Subject";
+          subjectCode = subject.code || "";
+        }
+      }
+
+      const card = document.createElement("div");
+      card.className = "subject";
+
+      card.innerHTML = `
+        <h3>${subjectName}</h3>
+        <p>${subjectCode} — ${note.title}</p>
+
+        ${
+          note.file_url
+            ? `
+              <a class="btn view"
+                 href="${note.file_url}"
+                 target="_blank"
+                 rel="noopener">
+                 View PDF
+              </a>
+
+              <a class="btn download"
+                 href="${note.file_url}"
+                 download>
+                 Download PDF
+              </a>
+            `
+            : `
+              <p>PDF available nahi hai.</p>
+            `
+        }
+      `;
+
+      notesList.appendChild(card);
+    }
+
+  } catch (error) {
+    console.error(error);
+    notesList.innerHTML =
+      '<div class="status">Notes load nahi ho paaye. Please refresh karke try karo.</div>';
+  }
+}
+
+loadNotes();
+</script>
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
