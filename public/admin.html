@@ -151,12 +151,22 @@
     © 2026 Study Notes
   </footer>
 
-  <script>
-    function uploadNote() {
-      document.getElementById("status").textContent =
-        "Upload system next step me connect hoga.";
-    }
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "https://cwyjgukhelxgzkjdujiv.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_QDRohrKjI0YSTl7I315N5w_oHmFrgsL";
+
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  async function uploadNote() {
+    document.getElementById("status").textContent =
+      "Upload system connect ho raha hai...";
+  }
+</script>
 
 </body>
 </html>
