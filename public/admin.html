@@ -162,6 +162,14 @@
     SUPABASE_ANON_KEY
   );
 
+  async function checkAdmin() {
+  const { data: { session } } =
+    await supabaseClient.auth.getSession();
+
+  if (!session) {
+    window.location.href = "admin-login.html";
+  }
+  }
   async function uploadNote() {
   const status = document.getElementById("status");
   const sectionName = document.getElementById("section").value;
