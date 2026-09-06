@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Study Notes</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f9fc;
+      color: #1f2937;
+    }
+
+    nav {
+      background: white;
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .back {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 40px 20px;
+    }
+
+    .hero,
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 7px;
+      font-weight: 600;
+    }
+
+    select,
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .status {
+      margin-top: 15px;
+      color: #6b7280;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="logo">Study Notes — Admin</div>
+    <a class="back" href="index.html">← Home</a>
+  </nav>
+
+  <div class="container">
+
+    <div class="hero">
+      <h1>Admin Dashboard</h1>
+      <p>Upload and manage study notes.</p>
+    </div>
+
+    <div class="card">
+
+      <label for="section">Section</label>
+      <select id="section">
+        <option>A1</option>
+        <option>A2</option>
+        <option>A3</option>
+        <option>A4</option>
+        <option>A5</option>
+        <option>A6</option>
+        <option>A7</option>
+        <option>A8</option>
+      </select>
+
+      <label for="subject">Subject</label>
+      <select id="subject">
+        <option value="2">Programming for Problem Solving — CSE101</option>
+      </select>
+
+      <label for="title">Note Title</label>
+      <input
+        id="title"
+        type="text"
+        placeholder="Example: Unit 2 - Data Types"
+      >
+
+      <label for="pdf">PDF File</label>
+      <input id="pdf" type="file" accept=".pdf">
+
+      <button onclick="uploadNote()">Upload Note</button>
+
+      <div id="status" class="status"></div>
+
+    </div>
+
+  </div>
+
+  <footer>
+    © 2026 Study Notes
+  </footer>
+
+  <script>
+    function uploadNote() {
+      document.getElementById("status").textContent =
+        "Upload system next step me connect hoga.";
+    }
+  </script>
+
+</body>
+</html>
