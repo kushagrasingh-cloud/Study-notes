@@ -1,1 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - Study Notes</title>
 
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f9fc;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 80px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 7px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      border: 0;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .status {
+      margin-top: 15px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="card">
+
+      <h1>Admin Login</h1>
+
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        placeholder="Admin email"
+      >
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        placeholder="Password"
+      >
+
+      <button onclick="loginAdmin()">Login</button>
+
+      <div id="status" class="status"></div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://cwyjgukhelxgzkjdujiv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_QDRohrKjI0YSTl7I315N5w_oHmFrgsL";
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    async function loginAdmin() {
+      const status = document.getElementById("status");
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        status.textContent = "Email aur password dono daalo.";
+        return;
+      }
+
+      status.textContent = "Login ho raha hai...";
+
+      const { error } =
+        await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+      if (error) {
+        status.textContent = "❌ " + error.message;
+        return;
+      }
+
+      status.textContent = "✅ Login successful!";
+
+      window.location.href = "admin.html";
+    }
+  </script>
+
+</body>
+</html>
