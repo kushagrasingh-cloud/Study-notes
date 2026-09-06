@@ -163,8 +163,80 @@
   );
 
   async function uploadNote() {
-    document.getElementById("status").textContent =
-      "Upload system connect ho raha hai...";
+  const status = document.getElementById("status");
+  const sectionName = document.getElementById("section").value;
+  const subjectId = document.getElementById("subject").value;
+  const title = document.getElementById("title").value.trim();
+  const file = document.getElementById("pdf").files[0];
+
+  try {
+    if (!title) {
+      throw new Error("Note title likho.");
+    }
+
+    if (!file) {
+      throw new Error("PDF select karo.");
+    }
+
+    if (file.type !== "application/pdf") {
+      throw new Error("Sirf PDF file upload karo.");
+    }
+
+    status.textContent = "PDF upload ho raha hai...";
+
+    const { data: sections, error: sectionError } =
+      await supabaseClient
+        .from("sections")
+        .select("id")
+        .eq("semester_id", 2)
+        .eq("name", sectionName)
+        .limit(1);
+
+    if (sectionError) throw sectionError;
+    if (!sections || sections.length === 0) {
+      throw new Error("Section nahi mila.");
+    }
+
+    const sectionId = sections[0].id;
+
+    const fileName =
+      sectionName + "_" + Date.now() + "_" +
+      file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+    const { error: uploadError } =
+      await supabaseClient.storage
+        .from("notes")
+        .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    status.textContent = "PDF upload ho gaya. Note save ho raha hai...";
+
+    const { data: publicUrlData } =
+      supabaseClient.storage
+        .from("notes")
+        .getPublicUrl(fileName);
+
+    const fileUrl = publicUrlData.publicUrl;
+
+    const { error: noteError } =
+      await supabaseClient
+        .from("notes")
+        .insert({
+          subject_id: Number(subjectId),
+          section_id: sectionId,
+          title: title,
+          description: sectionName + " Section Notes",
+          file_url: fileUrl
+        });
+
+    if (noteError) throw noteError;
+
+    status.textContent = "✅ Note successfully upload ho gaya!";
+
+  } catch (error) {
+    status.textContent = "❌ ERROR: " + error.message;
+  }
   }
 </script>
 
