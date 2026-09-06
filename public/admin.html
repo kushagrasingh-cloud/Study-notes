@@ -221,7 +221,7 @@
 
     const { error: noteError } =
       await supabaseClient
-        .from("Notes")
+        .from("notes")
         .insert({
           subject_id: Number(subjectId),
           section_id: sectionId,
